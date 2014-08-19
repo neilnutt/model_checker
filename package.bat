@@ -1,0 +1,1 @@
+python pyinstaller.py --onefile check_routines.py
