@@ -91,18 +91,18 @@ class IefCheck():
   def __init__(self):
     self.iefErrors = list()
     
-    self.datFile = None
-    self.runType = None
-    self.start = None
-    self.finish = None
-    self.timestep = None
-    self.iCsFrom = None
-    self.iedFile = None
-    self.resultLocation = None
+    self.datFile = 'None'
+    self.runType = 'None'
+    self.start = 'None'
+    self.finish = 'None'
+    self.timestep = 'None'
+    self.iCsFrom = 'None'
+    self.iedFile = 'None'
+    self.resultLocation = 'None'
     self.zznFile = 'None'
     self.zznSize = 'None'
     self.zznTime = 'None'
-    self.timestep2D  = None
+    self.timestep2D  = 'None'
     self.tcfFile = 'None'
     
   
