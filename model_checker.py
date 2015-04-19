@@ -96,7 +96,8 @@ class IefCheck():
     self.start = 'None'
     self.finish = 'None'
     self.timestep = 'None'
-    self.iCsFrom = 'None'
+    self.iCsFrom = ''
+    self.icFile = ''
     self.iedFile = 'None'
     self.resultLocation = 'None'
     self.zznFile = 'None'
@@ -104,7 +105,15 @@ class IefCheck():
     self.zznTime = 'None'
     self.timestep2D  = 'None'
     self.tcfFile = 'None'
-    
+    self.lastEditTime1D = 0
+    self.zzdMessage = 'None'
+
+    self.iefFileMsg= 'None'
+    self.datFileMsg ='None'
+    self.iedFileMsg = 'None'
+    self.resultsDirMsg = 'None'
+    self.icMsg = 'None'
+    self.tcfFileMsg = 'None'   
   
   def checkIef(self,filePath):
     print "Starting to check:",filePath
@@ -113,6 +122,12 @@ class IefCheck():
       return 1 
 
     os.chdir(os.path.split(filePath)[0])
+    
+    if os.path.isfile(filePath):
+      if os.path.getmtime(filePath) > self.lastEditTime1D:
+        self.lastEditTime1D = os.path.getmtime(filePath)
+    else:
+      self.iefFileMsg = 'File not found'
     
     f = open(filePath)
     
@@ -125,21 +140,44 @@ class IefCheck():
           fname = os.path.abspath(fname)
         if os.path.isfile(fname)==False:
           self.iefErrors.append(("ERROR ISIS file (.dat) doesn't exist:", fname))
+          self.datFileMsg = 'File not found'
         else:
           pass # Could check the dat file, i.e. number of nodes etc
           self.datFile = fname
+          if os.path.getmtime(fname) > self.lastEditTime1D:
+            self.lastEditTime1D = os.path.getmtime(fname)
       elif line.startswith('Results'):
         zznFile = line.split('=')[-1]+'.zzn'
+        zzdFile = line.split('=')[-1]+'.zzd'
         dirName = os.path.split(line.split('=')[-1])[0]
+        self.resultLocation = dirName
+        self.zznFile = zznFile
         if os.path.isdir(dirName)==False:
           self.iefErrors.append(("Results location doesn't exist:", dirName))
+          self.resultsDirMsg = 'Directory not found'
         else:
-          pass # Could check you have write premission at this location
-          self.resultLocation = dirName
-          self.zznFile = zznFile
+          # Check you have write premission at this location
+          try:
+            temp = os.path.join(self.resultLocation,'model_checker_temp_safe_to_delete')
+            t = open(temp,'w')
+            t.write('line')
+            t.close()
+            os.unlink(temp)
+          except:
+            self.resltsDirMsg = 'No write access'
+
           if os.path.isfile(zznFile):
-            self.zznTime = time.ctime(os.path.getmtime(zznFile))
+            self.zznTime = os.path.getmtime(zznFile)
             self.zznSize = str(os.path.getsize(zznFile)/1024/1024.0)
+          
+          if os.path.isfile(zzdFile):
+            d = open(zzdFile)
+            for dline in d:
+              if dline.startswith('run completed'):
+                self.zzdMessage = 'run completed'
+            d.close()
+    
+            
       elif line.startswith('Timestep'):
         self.timestep = line.split('=')[-1]
       elif line.startswith('RunType'):
@@ -149,7 +187,20 @@ class IefCheck():
       elif line.startswith('ICsFrom'):
         id=line.split('=')[-1]
         if id == '1':
-          self.iCsFrom = 'From dat file'
+          #self.iCsFrom = 'From dat file'
+          self.icFileMsg = 'From dat file'
+        id=line.split('=')[-1]
+        if id == '2':
+          #self.iCsFrom = 'From file'
+          self.icFileMsg = 'From file'
+      elif line.startswith('InitialConditions'):
+        fname  = line.split('=')[-1]
+        if fname.startswith('..'):
+          fname = os.path.abspath(fname)
+        self.icFile = fname
+        if os.path.isfile(self.icFile):
+          if os.path.getmtime(self.icFile) > self.lastEditTime1D:
+              self.lastEditTime1D = os.path.getmtime(self.icFile)
       elif line.startswith('Start'):
         self.start = line.split('=')[-1]
       elif line.startswith('Finish'):
@@ -158,20 +209,25 @@ class IefCheck():
         fname = line.split('=')[-1]
         if fname.startswith('..'):
           fname = os.path.abspath(fname)
+        self.iedFile = fname          
         if os.path.isfile(fname)==False:
           self.iefErrors.append(("Event data file (.ied) doesn't exist:", fname))
+          self.iedFileMsg = 'File not found'
         else:
           pass # could check that the nodes listed in the ied exist in the dat
-          self.iedFile = fname
+          if os.path.getmtime(fname) > self.lastEditTime1D:
+            self.lastEditTime1D = os.path.getmtime(fname)
+          
       elif line.startswith('2DFile'):
         fname = line.split('=')[-1]
         if fname.startswith('..'):
           fname = os.path.abspath(fname)
+        self.tcfFile = fname
         if os.path.isfile(fname)==False:
           self.iefErrors.append(("2D file (.tcf) doesn't exist:", fname))
-        self.tcfFile = fname
-        print()
-        print(fname)
+          self.tcfFileMsg = 'File not found'
+        if os.path.getmtime(fname) > self.lastEditTime1D:
+            self.lastEditTime1D = os.path.getmtime(fname)
           
     if len(self.iefErrors)== 0:
       print "No errors found in ief"
