@@ -4,7 +4,6 @@ v0.0.1
 ''' 
 import os,time
 import check_1d2d_linkage
-from Image import NONE
 
 
 def identifyFileType(filePath):
@@ -91,6 +90,7 @@ class IefCheck():
   def __init__(self):
     self.iefErrors = list()
     
+    self.iefFile = 'None'
     self.datFile = 'None'
     self.runType = 'None'
     self.start = 'None'
@@ -116,6 +116,7 @@ class IefCheck():
     
     f = open(filePath)
     
+    self.iefFile = filePath
     for line in f.readlines():
       line = line.split('\n')[0]
       if line.startswith('Datafile'):
@@ -378,31 +379,32 @@ class TcfCheck():
       fname = os.path.join(self.results_dir,os.path.splitext(os.path.split(self.tcfFile)[-1])[0]+'.'+self.results_format)
       if fname.startswith('..'):
           fname = os.path.abspath(fname)
-      self.resultsTimestamp = time.ctime(os.path.getmtime(fname))
-      self.resultsSize = str(os.path.getsize(fname)/1024/1024.0)
+      if os.path.isfile(fname):
+        self.resultsTimestamp = time.ctime(os.path.getmtime(fname))
+        self.resultsSize = str(os.path.getsize(fname)/1024/1024.0)
       
     if self.log_dir is not None:
       self.tlfFile = os.path.join(self.log_dir,os.path.splitext(os.path.split(self.tcfFile)[-1])[0]+'.tlf')
-      print(self.tlfFile)
       if self.tlfFile.startswith('..'):
           self.tlfFile = os.path.abspath(self.tlfFile)
-      f = open(self.tlfFile)
-      for line in f:
-        line = line.replace('\n','')
-        if line.startswith('CPU Time'):
-          self.cpuTime = line.split('or')[-1]
-        if line.startswith('WARNINGs prior'):
-          self.setupWarnings = line.split(':')[-1].split('[')[0]
-        if line.startswith('WARNINGs during'):
-          self.runWarnings = line.split(':')[-1].split('[')[0]
-        if line.startswith ('Peak Flow In'):
-          self.peakInflow = line.split(':')[-1]
-        if line.startswith('Peak Flow Out'):
-          self.peakOutflow = line.split(':')[-1]
-        if line.startswith('Final Cumulative ME'):
-          self.finalCumulativeMB = line.split(':')[-1]
-        if line.startswith('Peak Cumulative ME'):
-          self.peakCumulativeMB = line.split(':')[-1]        
+      if os.path.isfile(self.tlfFile):
+        f = open(self.tlfFile)
+        for line in f:
+          line = line.replace('\n','')
+          if line.startswith('CPU Time'):
+            self.cpuTime = line.split('or')[-1]
+          if line.startswith('WARNINGs prior'):
+            self.setupWarnings = line.split(':')[-1].split('[')[0]
+          if line.startswith('WARNINGs during'):
+            self.runWarnings = line.split(':')[-1].split('[')[0]
+          if line.startswith ('Peak Flow In'):
+            self.peakInflow = line.split(':')[-1]
+          if line.startswith('Peak Flow Out'):
+            self.peakOutflow = line.split(':')[-1]
+          if line.startswith('Final Cumulative ME'):
+            self.finalCumulativeMB = line.split(':')[-1]
+          if line.startswith('Peak Cumulative ME'):
+            self.peakCumulativeMB = line.split(':')[-1]        
         
     if self.tbcFile is not None:
       tbcErrors = checkTbc(self.tbcFile,self.bc_db_file)
@@ -499,7 +501,7 @@ def checkTgf(filePath):
 if __name__ == '__main__':
   from sys import argv
   if len(argv) == 1 and argv[0].lower()[-3:] != 'exe':
-      filePath = r"P:\Glasgow\WNE\PROJECTS\345488-Riverside,MerthyrTydfil\Hydraulics\v2.2\3 Model\1D\Baseline Model\100yr\Defended\test.ief"
+      filePath = r"P:\Glasgow\WNE\PROJECTS\345488-Riverside,MerthyrTydfil\Hydraulics\v2.2\3 Model\1D\Proposed Model\1000yr\Defended\UpperTaff_v2.2_1D-10m-Proposedv29-1000yr-2015.ief"
   elif argv[0].lower() == 'python' and len(argv) != 3:
       print 'Wrong number of parameters'
       print 'EXAMPLE:   python check_routines.py model.ief'
