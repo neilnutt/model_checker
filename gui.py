@@ -85,8 +85,8 @@ class MainFrame(wx.Frame):
 
         # create the page windows as children of the notebook
         self.page1 = isisRun.Fpanel(nb,self)
-        self.page2 = tuflowRun.Fpanel(nb,self.page1)
-        self.page3 = linkage.Fpanel(nb,self.page1)
+        self.page2 = tuflowRun.Fpanel(nb,self)
+        self.page3 = linkage.Fpanel(nb,self)
 
         # add the pages to the notebook with the label to show on the tab
         nb.AddPage(self.page1, "ISIS model")

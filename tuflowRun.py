@@ -253,28 +253,35 @@ class Fpanel(wx.Panel):
       self.refreshTcf()
         
     def refreshTcf(self):
-      self.p.ief.checkIef(self.fname)
-      self.datFile.SetValue(self.p.ief.datFile)
-      self.iedFile.SetValue(self.p.ief.iedFile)
-      self.ic.SetValue(self.p.ief.icFile)
-      self.resultsDir.SetValue(self.p.ief.resultLocation)
-      self.tcfFile.SetValue(self.p.ief.tcfFile)
+      self.p.tcf.checkTcf(self.fname)
       
-      self.runType.SetValue(self.p.ief.runType)
-      self.start.SetValue(self.p.ief.start)
-      self.finish.SetValue(self.p.ief.finish)
-      self.timestep.SetValue(self.p.ief.timestep)
-      self.timestep2D.SetValue(self.p.ief.timestep2D)
+      self.tcfFile.SetValue(self.p.tcf.tcfFile)
+      self.tbcFile.SetValue(self.p.tcf.tbcFile)
+      self.tgcFile.SetValue(self.p.tcf.tgcFile)
+      self.tmfFile.SetValue(self.p.tcf.tmfFile)
+      self.projection.SetValue(self.p.tcf.projection)
+      self.bc_db_file.SetValue(self.p.tcf.bc_db_file)
+      
+      self.nwk_lines.SetValue(self.p.tcf.nwk_lines)
+      self.nwk_nds.SetValue(self.p.tcf.nwk_nds)
+      self.wll.SetValue(self.p.tcf.wll)
+      
+      self.log_dir.SetValue(self.p.tcf.log_dir)
+      self.tlfFile.SetValue(self.p.tcf.tlfFile)
+      self.results_dir.SetValue(self.p.tcf.results_dir)
+      self.check_dir.SetValue(self.p.tcf.check_dir)
   
-      self.zznFile.SetValue(self.p.ief.zznFile)
-      self.lastEditTime1D.SetValue(str(time.ctime(self.p.ief.lastEditTime1D)))
-      self.zznTime.SetValue(str(time.ctime(self.p.ief.zznTime)))
-      self.zznSize.SetValue(self.p.ief.zznSize)
-      self.zzdMessage.SetValue(self.p.ief.zzdMessage) 
-        
-      self.iefFileMsg.SetValue(self.p.ief.iefFileMsg)
-      self.datFileMsg.SetValue(self.p.ief.datFileMsg)
-      self.iedFileMsg.SetValue(self.p.ief.iedFileMsg)
-      self.resultsDirMsg.SetValue(self.p.ief.resultsDirMsg)
-      self.icMsg.SetValue(self.p.ief.icMsg)
-      self.tcfFileMsg.SetValue(self.p.ief.tcfFileMsg)                  
+      self.results_format.SetValue(self.p.tcf.results_format)
+      self.results_variables.SetValue(self.p.tcf.results_variables)
+      
+      #self.resultsTimestamp.SetValue(str(time.ctime(self.p.tcf.resultsTimestamp)))
+      self.resultsSize.SetValue(self.p.tcf.resultsSize)
+      self.cpuTime.SetValue(self.p.tcf.cpuTime) 
+      self.setupWarnings.SetValue(self.p.tcf.setupWarnings)
+      self.runWarnings.SetValue(self.p.tcf.runWarnings)
+      self.peakInflow.SetValue(self.p.tcf.peakInflow)
+      self.peakOutflow.SetValue(self.p.tcf.peakOutflow) 
+      self.finalCumulativeMB.SetValue(self.p.tcf.finalCumulativeMB)
+      self.peakCumulativeMB.SetValue(self.p.tcf.peakCumulativeMB)
+
+                        
