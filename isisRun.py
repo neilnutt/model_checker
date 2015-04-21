@@ -141,7 +141,7 @@ class Fpanel(wx.Panel):
     
         sizer.Add(self.iefFileEdit_btn,pos=(0,4))
         sizer.Add(self.datFileEdit_btn,pos=(1,4))
-        sizer.Add(self.datFileEdit_btn,pos=(2,4))
+        sizer.Add(self.iedFileEdit_btn,pos=(2,4))
         
         sizer.Add(self.iefFile_btn,pos=(0,5))
                 
@@ -206,5 +206,5 @@ class Fpanel(wx.Panel):
       self.datFileMsg.SetValue(self.p.ief.datFileMsg)
       self.iedFileMsg.SetValue(self.p.ief.iedFileMsg)
       self.resultsDirMsg.SetValue(self.p.ief.resultsDirMsg)
-      self.icMsg.SetValue(self.p.ief.icMsg)
+      self.icMsg.SetValue(self.p.ief.icFileMsg)
       self.tcfFileMsg.SetValue(self.p.ief.tcfFileMsg)                  
