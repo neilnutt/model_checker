@@ -448,19 +448,19 @@ class TcfCheck():
         for line in f:
           line = line.replace('\n','')
           if line.startswith('CPU Time'):
-            self.cpuTime = line.split('or')[-1]
+            self.cpuTime = line.split('or')[-1].rstrip().lstrip()
           if line.startswith('WARNINGs prior'):
-            self.setupWarnings = line.split(':')[-1].split('[')[0]
+            self.setupWarnings = line.split(':')[-1].split('[')[0].rstrip().lstrip()
           if line.startswith('WARNINGs during'):
-            self.runWarnings = line.split(':')[-1].split('[')[0]
+            self.runWarnings = line.split(':')[-1].split('[')[0].rstrip().lstrip()
           if line.startswith ('Peak Flow In'):
-            self.peakInflow = line.split(':')[-1]
+            self.peakInflow = line.split(':')[-1].rstrip().lstrip()
           if line.startswith('Peak Flow Out'):
-            self.peakOutflow = line.split(':')[-1]
+            self.peakOutflow = line.split(':')[-1].rstrip().lstrip()
           if line.startswith('Final Cumulative ME'):
-            self.finalCumulativeMB = line.split(':')[-1]
+            self.finalCumulativeMB = line.split(':')[-1].rstrip().lstrip()
           if line.startswith('Peak Cumulative ME'):
-            self.peakCumulativeMB = line.split(':')[-1]        
+            self.peakCumulativeMB = line.split(':')[-1][0:35].rstrip().lstrip()        
         
     if self.tbcFile is not None:
       tbcErrors = checkTbc(self.tbcFile,self.bc_db_file)
