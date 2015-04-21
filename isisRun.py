@@ -34,6 +34,7 @@ class Fpanel(wx.Panel):
         self.fileName = ''
         self.iefEditor = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
         self.datEditor = 'C:\\isis\\bin\\Isis3.exe'
+        self.iedEditor = 'C:\\isis\\bin\\Isis3.exe'
 
         self.iefFileLabel = wx.StaticText(self, -1, ".ief file" ) 
         self.datFileLabel = wx.StaticText(self, -1, ".dat file" )  
@@ -82,12 +83,13 @@ class Fpanel(wx.Panel):
           
         self.iefFile_btn = wx.Button(self, -1, '...')
         self.iefFileEdit_btn = wx.Button(self, -1, 'Edit')
-        self.datFileEdit_btn = wx.Button(self, -1, 'Edit') 
+        self.datFileEdit_btn = wx.Button(self, -1, 'Edit')
+        self.iedFileEdit_btn = wx.Button(self, -1, 'Edit')  
         
         #  Assign actions to buttons
         self.iefFile_btn.Bind(wx.EVT_BUTTON, self.changeIef)
         self.iefFileEdit_btn.Bind(wx.EVT_BUTTON, self.editIef)
-        self.datFileEdit_btn.Bind(wx.EVT_BUTTON, self.editDat)
+        self.datFileEdit_btn.Bind(wx.EVT_BUTTON, self.editIed)
         
         # use gridbagsizer for layout of widgets
         sizer = wx.GridBagSizer(vgap=2, hgap=10)
@@ -139,7 +141,8 @@ class Fpanel(wx.Panel):
     
         sizer.Add(self.iefFileEdit_btn,pos=(0,4))
         sizer.Add(self.datFileEdit_btn,pos=(1,4))
-    
+        sizer.Add(self.datFileEdit_btn,pos=(2,4))
+        
         sizer.Add(self.iefFile_btn,pos=(0,5))
                 
         # use boxsizer to add border around sizer
@@ -159,6 +162,12 @@ class Fpanel(wx.Panel):
         subprocess.call([self.datEditor,self.p.ief.datFile])
       else:
         self.datFileMsg.SetValue('File not found')
+
+    def editIed(self,event):
+      if os.path.isfile(self.p.ief.iedFile):
+        subprocess.call([self.datEditor,self.p.ief.iedFile])
+      else:
+        self.iedFileMsg.SetValue('File not found')
         
     def changeIef(self,event):
       """ File|Open event - Open dialog box. """
