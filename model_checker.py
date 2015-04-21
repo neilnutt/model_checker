@@ -112,7 +112,7 @@ class IefCheck():
     self.datFileMsg ='None'
     self.iedFileMsg = 'None'
     self.resultsDirMsg = 'None'
-    self.icMsg = 'None'
+    self.icFileMsg = 'From steady state results'
     self.tcfFileMsg = 'None'   
   
   def checkIef(self,filePath):
