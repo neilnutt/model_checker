@@ -171,7 +171,7 @@ class IefCheck():
 
         if os.path.isfile(self.zznFile):
           self.zznTime = os.path.getmtime(self.zznFile)
-          self.zznSize = str(os.path.getsize(self.zznFile)/1024/1024.0)
+          self.zznSize = str(round(os.path.getsize(self.zznFile)/1024/1024.0),2)
         
         if os.path.isfile(self.zzdFile):
           d = open(self.zzdFile)

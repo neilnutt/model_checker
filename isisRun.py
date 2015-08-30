@@ -51,7 +51,7 @@ class Fpanel(wx.Panel):
         self.timestep2DLabel = wx.StaticText(self, -1, "2D timestep" )
         
         self.zznFileLabel = wx.StaticText(self, -1, ".zzn file" )
-        self.lastEditTime1DLabel = wx.StaticText(self, -1, "1D last edit" )
+        self.lastEditTime1DLabel = wx.StaticText(self, -1, "Input last edit" )
         self.zznTimeLabel = wx.StaticText(self, -1, ".zzn write time" )
         self.zznSizeLabel = wx.StaticText(self, -1, ".zzn size" )
         self.zzdMessageLabel = wx.StaticText(self, -1, ".zzd message" )       
@@ -86,7 +86,7 @@ class Fpanel(wx.Panel):
         self.iefFile_btn = wx.Button(self, -1, '...')
         self.iefFileEdit_btn = wx.Button(self, -1, 'Edit')
         self.datFileEdit_btn = wx.Button(self, -1, 'Edit')
-        self.iedFileEdit_btn = wx.Button(self, -1, 'Edit')  
+        self.iedFileEdit_btn = wx.Button(self, -1, 'Edit')
         
         #  Assign actions to buttons
         self.iefFile_btn.Bind(wx.EVT_BUTTON, self.changeIef)
@@ -142,7 +142,7 @@ class Fpanel(wx.Panel):
         sizer.Add(self.zzdFileEdit_btn,pos=(14,2))
         sizer.Add(self.lastEditTime1D,pos=(15,1))
         sizer.Add(self.zznTime,pos=(16,1))
-        sizer.Add(self.zznSize,pos=(17,1))        
+        sizer.Add(self.zznSize,pos=(17,1))       
     
         sizer.Add(self.iefFileEdit_btn,pos=(0,5))
         sizer.Add(self.datFileEdit_btn,pos=(1,5))
@@ -211,7 +211,7 @@ class Fpanel(wx.Panel):
       self.lastEditTime1D.SetValue(str(time.ctime(self.p.ief.lastEditTime1D)))
       if type(self.p.ief.zznTime) == type(float()):
         self.zznTime.SetValue(str(time.ctime(self.p.ief.zznTime)))
-        self.zznSize.SetValue(self.p.ief.zznSize)
+        self.zznSize.SetValue(self.p.ief.zznSize+' MB')
         self.zzdMessage.SetValue(self.p.ief.zzdMessage)
       else:
         self.zznTime.SetValue('')
@@ -223,4 +223,4 @@ class Fpanel(wx.Panel):
       self.iedFileMsg.SetValue(self.p.ief.iedFileMsg)
       self.resultsDirMsg.SetValue(self.p.ief.resultsDirMsg)
       self.icMsg.SetValue(self.p.ief.icFileMsg)
-      self.tcfFileMsg.SetValue(self.p.ief.tcfFileMsg)                  
+      self.tcfFileMsg.SetValue(self.p.ief.tcfFileMsg)                 
