@@ -103,6 +103,8 @@ class IefCheck():
     self.zznFile = 'None'
     self.zznSize = 'None'
     self.zznTime = 'None'
+    self.zzdFile = 'None'
+    self.zznFile = 'None'
     self.timestep2D  = 'None'
     self.tcfFile = 'None'
     self.lastEditTime1D = 0
@@ -147,13 +149,12 @@ class IefCheck():
           if os.path.getmtime(fname) > self.lastEditTime1D:
             self.lastEditTime1D = os.path.getmtime(fname)
       elif line.startswith('Results'):
-        zznFile = line.split('=')[-1]+'.zzn'
-        zzdFile = line.split('=')[-1]+'.zzd'
+        self.zznFile = line.split('=')[-1]+'.zzn'
+        self.zzdFile = line.split('=')[-1]+'.zzd'
         dirName = os.path.split(line.split('=')[-1])[0]
         self.resultLocation = dirName
-        self.zznFile = zznFile
-        if '\\' not in dirName:
-          pass
+        if ':' not in dirName: ##then it is relative to the cwd and need to convert to abs  
+          self.resultLocation = os.path.join(os.path.split(self.iefFile)[0],self.resultLocation)
         elif os.path.isdir(dirName)==False:
           self.iefErrors.append(("Results location doesn't exist:", dirName))
           self.resultsDirMsg = 'Directory not found'
@@ -168,16 +169,17 @@ class IefCheck():
           except:
             self.resltsDirMsg = 'No write access'
 
-          if os.path.isfile(zznFile):
-            self.zznTime = os.path.getmtime(zznFile)
-            self.zznSize = str(os.path.getsize(zznFile)/1024/1024.0)
-          
-          if os.path.isfile(zzdFile):
-            d = open(zzdFile)
-            for dline in d:
-              if dline.startswith('run completed'):
-                self.zzdMessage = 'run completed'
-            d.close()
+        if os.path.isfile(self.zznFile):
+          self.zznTime = os.path.getmtime(self.zznFile)
+          self.zznSize = str(os.path.getsize(self.zznFile)/1024/1024.0)
+        
+        if os.path.isfile(self.zzdFile):
+          d = open(self.zzdFile)
+          self.zzdMessage = 'run not completed'
+          for dline in d:
+            if dline.startswith('run completed'):
+              self.zzdMessage = 'run completed'
+          d.close()
     
             
       elif line.startswith('Timestep'):

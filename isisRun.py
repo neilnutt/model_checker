@@ -35,6 +35,7 @@ class Fpanel(wx.Panel):
         self.iefEditor = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
         self.datEditor = 'C:\\isis\\bin\\Isis3.exe'
         self.iedEditor = 'C:\\isis\\bin\\Isis3.exe'
+        self.zzdEditor = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
 
         self.iefFileLabel = wx.StaticText(self, -1, ".ief file" ) 
         self.datFileLabel = wx.StaticText(self, -1, ".dat file" )  
@@ -70,16 +71,17 @@ class Fpanel(wx.Panel):
         self.icMsg = wx.TextCtrl(self, -1, "-",size=(100,20), style =wx.TE_READONLY)
         self.tcfFileMsg = wx.TextCtrl(self, -1, "-",size=(100,20), style =wx.TE_READONLY)
         
-        self.runType = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY)
-        self.start = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY)
-        self.finish = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY)
-        self.timestep = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY)
-        self.timestep2D = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY) 
+        self.runType = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY)
+        self.start = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY)
+        self.finish = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY)
+        self.timestep = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY)
+        self.timestep2D = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY) 
 
-        self.lastEditTime1D = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY)
-        self.zznTime = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY)
-        self.zznSize = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY)
-        self.zzdMessage = wx.TextCtrl(self, -1, "-",size=(400,20), style =wx.TE_READONLY)
+        self.lastEditTime1D = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY)
+        self.zznTime = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY)
+        self.zznSize = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY)
+        self.zzdMessage = wx.TextCtrl(self, -1, "-",size=(300,20), style =wx.TE_READONLY)
+        self.zzdFileEdit_btn = wx.Button(self, -1, 'View')
           
         self.iefFile_btn = wx.Button(self, -1, '...')
         self.iefFileEdit_btn = wx.Button(self, -1, 'Edit')
@@ -91,6 +93,7 @@ class Fpanel(wx.Panel):
         self.iefFileEdit_btn.Bind(wx.EVT_BUTTON, self.editIef)
         self.datFileEdit_btn.Bind(wx.EVT_BUTTON, self.editDat)
         self.iedFileEdit_btn.Bind(wx.EVT_BUTTON, self.editIed)
+        self.zzdFileEdit_btn.Bind(wx.EVT_BUTTON, self.editZzd)
         
         # use gridbagsizer for layout of widgets
         sizer = wx.GridBagSizer(vgap=2, hgap=10)
@@ -114,20 +117,20 @@ class Fpanel(wx.Panel):
         sizer.Add(self.zznTimeLabel,pos=(16,0))
         sizer.Add(self.zznSizeLabel,pos=(17,0))       
         
-        sizer.Add(self.iefFile,pos=(0,1),span=(1,2))
-        sizer.Add(self.datFile,pos=(1,1),span=(1,2))
-        sizer.Add(self.iedFile,pos=(2,1),span=(1,2))
-        sizer.Add(self.resultsDir,pos=(3,1),span=(1,2))
-        sizer.Add(self.ic,pos=(4,1),span=(1,2))
-        sizer.Add(self.tcfFile,pos=(5,1),span=(1,2))
-        sizer.Add(self.zznFile,pos=(6,1))      
+        sizer.Add(self.iefFile,pos=(0,1),span=(1,3))
+        sizer.Add(self.datFile,pos=(1,1),span=(1,3))
+        sizer.Add(self.iedFile,pos=(2,1),span=(1,3))
+        sizer.Add(self.resultsDir,pos=(3,1),span=(1,3))
+        sizer.Add(self.ic,pos=(4,1),span=(1,3))
+        sizer.Add(self.tcfFile,pos=(5,1),span=(1,3))
+        sizer.Add(self.zznFile,pos=(6,1),span=(1,3))      
  
-        sizer.Add(self.iefFileMsg,pos=(0,3))  
-        sizer.Add(self.datFileMsg,pos=(1,3))  
-        sizer.Add(self.iedFileMsg,pos=(2,3))  
-        sizer.Add(self.resultsDirMsg,pos=(3,3))  
-        sizer.Add(self.icMsg,pos=(4,3))  
-        sizer.Add(self.tcfFileMsg,pos=(5,3))        
+        sizer.Add(self.iefFileMsg,pos=(0,4))  
+        sizer.Add(self.datFileMsg,pos=(1,4))  
+        sizer.Add(self.iedFileMsg,pos=(2,4))  
+        sizer.Add(self.resultsDirMsg,pos=(3,4))  
+        sizer.Add(self.icMsg,pos=(4,4))  
+        sizer.Add(self.tcfFileMsg,pos=(5,4))        
         
         sizer.Add(self.runType,pos=(8,1))
         sizer.Add(self.start,pos=(9,1))
@@ -136,15 +139,16 @@ class Fpanel(wx.Panel):
         sizer.Add(self.timestep2D,pos=(12,1))           
 
         sizer.Add(self.zzdMessage,pos=(14,1))
+        sizer.Add(self.zzdFileEdit_btn,pos=(14,2))
         sizer.Add(self.lastEditTime1D,pos=(15,1))
         sizer.Add(self.zznTime,pos=(16,1))
         sizer.Add(self.zznSize,pos=(17,1))        
     
-        sizer.Add(self.iefFileEdit_btn,pos=(0,4))
-        sizer.Add(self.datFileEdit_btn,pos=(1,4))
-        sizer.Add(self.iedFileEdit_btn,pos=(2,4))
+        sizer.Add(self.iefFileEdit_btn,pos=(0,5))
+        sizer.Add(self.datFileEdit_btn,pos=(1,5))
+        sizer.Add(self.iedFileEdit_btn,pos=(2,5))
         
-        sizer.Add(self.iefFile_btn,pos=(0,5))
+        sizer.Add(self.iefFile_btn,pos=(0,6))
                 
         # use boxsizer to add border around sizer
         border = wx.BoxSizer()
@@ -169,6 +173,12 @@ class Fpanel(wx.Panel):
         subprocess.call([self.datEditor,self.p.ief.iedFile])
       else:
         self.iedFileMsg.SetValue('File not found')
+    
+    def editZzd(self,event):
+      if os.path.isfile(self.p.ief.zzdFile):
+        subprocess.call([self.zzdEditor,self.p.ief.zzdFile])
+      else:
+        pass ## Fix me, raise an error
         
     def changeIef(self,event):
       """ File|Open event - Open dialog box. """
@@ -199,7 +209,7 @@ class Fpanel(wx.Panel):
   
       self.zznFile.SetValue(self.p.ief.zznFile)
       self.lastEditTime1D.SetValue(str(time.ctime(self.p.ief.lastEditTime1D)))
-      if type(self.p.ief.zznTime) == float():
+      if type(self.p.ief.zznTime) == type(float()):
         self.zznTime.SetValue(str(time.ctime(self.p.ief.zznTime)))
         self.zznSize.SetValue(self.p.ief.zznSize)
         self.zzdMessage.SetValue(self.p.ief.zzdMessage)
