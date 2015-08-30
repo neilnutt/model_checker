@@ -152,7 +152,9 @@ class IefCheck():
         dirName = os.path.split(line.split('=')[-1])[0]
         self.resultLocation = dirName
         self.zznFile = zznFile
-        if os.path.isdir(dirName)==False:
+        if '\\' not in dirName:
+          pass
+        elif os.path.isdir(dirName)==False:
           self.iefErrors.append(("Results location doesn't exist:", dirName))
           self.resultsDirMsg = 'Directory not found'
         else:
@@ -160,7 +162,7 @@ class IefCheck():
           try:
             temp = os.path.join(self.resultLocation,'model_checker_temp_safe_to_delete')
             t = open(temp,'w')
-            t.write('line')
+            t.write('model_checker_temp_file_safe_to_delete')
             t.close()
             os.unlink(temp)
           except:
@@ -255,6 +257,10 @@ class TcfCheck():
     self.results_dir = 'None'
     self.check_dir = 'None'
     self.generic_read = 'None'
+    self.resolution = 'None'
+    self.timestep = 'None'
+    self.start = 'None'
+    self.end = 'None'
     self.results_format = 'None'
     self.results_variables = 'None'
     self.resultsTimestamp = 'None'
@@ -318,6 +324,15 @@ class TcfCheck():
         if os.path.isfile(fname)==False:
           self.tcfErrors.append(("ERROR gc control file (.tgc) doesn't exist:", fname))
         self.tgcFile = fname
+
+      elif line.startswith('start time'):
+        self.start = line.split('==')[-1].replace(' ','').rstrip()
+
+      elif line.startswith('end time'):
+        self.end = line.split('==')[-1].replace(' ','').rstrip()        
+
+      elif line.startswith('timestep'):
+        self.timestep = line.split('==')[-1].replace(' ','').rstrip()  
     
       elif line.startswith('read materials file'):
         fname = line.split('==')[-1].replace(' ','').rstrip()
@@ -397,7 +412,9 @@ class TcfCheck():
         if path.startswith('\\'):
           path = path[1:]
         path = os.path.abspath(path)
-        if os.path.isdir(path)==False:
+        if '\\' not in path:
+          self.results_dir='ief dir'
+        elif os.path.isdir(path)==False:
           self.tcfErrors.append(("ERROR output directory doesn't exist:", path))
         else:
           pass # Could check for write access
@@ -463,12 +480,12 @@ class TcfCheck():
             self.peakCumulativeMB = line.split(':')[-1][0:35].rstrip().lstrip()        
         
     if self.tbcFile is not None:
-      tbcErrors = checkTbc(self.tbcFile,self.bc_db_file)
+      tbcErrors = self.checkTbc(self.tbcFile,self.bc_db_file)
       for error in tbcErrors:
         self.tcfErrors.append(error)
     
     if self.tgcFile is not None:
-      tgcErrors = checkTgf(self.tgcFile)
+      tgcErrors = self.checkTgc(self.tgcFile)
       for error in tgcErrors:
         self.tcfErrors.append(error)
     
@@ -479,85 +496,86 @@ class TcfCheck():
     
 
 
-def checkTbc(filePath,bc_db=None): 
-  print "Starting to check:",filePath
-  tbcErrors = list()
-  if os.path.isfile(filePath) == False:
-    tbcErrors.append("File doesn't exist:", filePath)
-    return 1 
-  os.chdir(os.path.split(filePath)[0])
-
+  def checkTbc(self,filePath,bc_db=None): 
+    print "Starting to check:",filePath
+    tbcErrors = list()
+    if os.path.isfile(filePath) == False:
+      tbcErrors.append("File doesn't exist:", filePath)
+      return 1 
+    os.chdir(os.path.split(filePath)[0])
   
-  f = open(filePath)
-  
-  for line in f.readlines():
-    line = line.split('\n')[0].lower()
-    if line.startswith('!') or line.startswith('#') or len(line.replace(' ','')) == 0:
-      continue
     
-    line = line.split('!')[0]
+    f = open(filePath)
     
-    if line.startswith('read'):  ## Generic check of other reads
-      fname = line.split('==')[-1].replace(' ','').rstrip()
-      if fname.startswith('\\'):
-          fname = fname[1:]
-      fname = os.path.abspath(fname)
-      if os.path.isfile(fname)==False:
-        tbcErrors.append(("ERROR unidentified file doesn't exist:", fname))
-      else:
-        pass # Could check the contents of the file
+    for line in f.readlines():
+      line = line.split('\n')[0].lower()
+      if line.startswith('!') or line.startswith('#') or len(line.replace(' ','')) == 0:
+        continue
       
-  return tbcErrors
-
-
-def checkTgf(filePath): 
-  print "Starting to check:",filePath
-  tgcErrors = list()
-  if os.path.isfile(filePath) == False:
-    tgcErrors.append("File doesn't exist:", filePath)
-    return 1 
-  
-  os.chdir(os.path.split(filePath)[0])
-  
-  f = open(filePath)
-  
-  for line in f.readlines():
-    line = line.split('\n')[0].lower()
-    if line.startswith('!') or line.startswith('#') or len(line.replace(' ','')) == 0:
-      continue
-    
-    line = line.split('!')[0]
-    
-    if line.startswith('read'):
-      if '|' in line:
-        fs = line.split('|')
-        for f in fs:
-          fname = f.split('==')[-1].replace(' ','').rstrip()
-          if fname.startswith('\\'):
-            fname = fname[1:]
-          fname = os.path.abspath(fname)
-          if os.path.isfile(fname)==False:
-            tgcErrors.append(("ERROR file does not exist:", fname))
-
-      else:
+      line = line.split('!')[0]
+      
+      if line.startswith('read'):  ## Generic check of other reads
         fname = line.split('==')[-1].replace(' ','').rstrip()
         if fname.startswith('\\'):
-          fname = fname[1:]
-        absFname = os.path.abspath(fname)
-        if os.path.isfile(absFname)==False:
-          #print "Rel:",fname
-          #print "Abs:",absFname
-          tgcErrors.append(("ERROR file does not exist:", absFname))
+            fname = fname[1:]
+        fname = os.path.abspath(fname)
+        if os.path.isfile(fname)==False:
+          tbcErrors.append(("ERROR unidentified file doesn't exist:", fname))
         else:
           pass # Could check the contents of the file
+        
+    return tbcErrors
+
+
+  def checkTgc(self,filePath): 
+    print "Starting to check:",filePath
+    tgcErrors = list()
+    if os.path.isfile(filePath) == False:
+      tgcErrors.append(("File doesn't exist:", filePath))
+      return 1 
+    
+    os.chdir(os.path.split(filePath)[0])
+    
+    f = open(filePath)
+    
+    for line in f.readlines():
+      line = line.split('\n')[0].lower()
+      if line.startswith('!') or line.startswith('#') or len(line.replace(' ','')) == 0:
+        continue
       
-  return tgcErrors
+      line = line.split('!')[0]
+      
+      if line.startswith('cell size'):
+        self.resolution = line.split('==')[-1].replace(' ','').rstrip()
+      elif line.startswith('read'):
+        if '|' in line:
+          for geomFile in line.split('|'):
+            fname = geomFile.split('==')[-1].replace(' ','').rstrip()
+            if fname.startswith('\\'):
+              fname = fname[1:]
+            fname = os.path.abspath(fname)
+            if os.path.isfile(fname)==False:
+              tgcErrors.append(("ERROR file does not exist:", fname))
+  
+        else:
+          fname = line.split('==')[-1].replace(' ','').rstrip()
+          if fname.startswith('\\'):
+            fname = fname[1:]
+          absFname = os.path.abspath(fname)
+          if os.path.isfile(absFname)==False:
+            #print "Rel:",fname
+            #print "Abs:",absFname
+            tgcErrors.append(("ERROR file does not exist:", absFname))
+          else:
+            pass # Could check the contents of the file
+        
+    return tgcErrors
 
 
 if __name__ == '__main__':
   from sys import argv
   if len(argv) == 1 and argv[0].lower()[-3:] != 'exe':
-      filePath = r"P:\Glasgow\WNE\PROJECTS\345488-Riverside,MerthyrTydfil\Hydraulics\v2.2\3 Model\1D\Proposed Model\1000yr\Defended\UpperTaff_v2.2_1D-10m-Proposedv29-1000yr-2015.ief"
+      filePath = r"P:\Glasgow\WNE\PROJECTS\357291-Aberfan_Weir_NRW\Hydraulics\v2.2\3 Model\1D\Proposed Model\1000yr\Defended\UpperTaff_v2.2_1D-10m-Proposedv32_0m_weir-1000yr.ief"
   elif argv[0].lower() == 'python' and len(argv) != 3:
       print 'Wrong number of parameters'
       print 'EXAMPLE:   python check_routines.py model.ief'

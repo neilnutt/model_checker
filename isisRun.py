@@ -89,7 +89,8 @@ class Fpanel(wx.Panel):
         #  Assign actions to buttons
         self.iefFile_btn.Bind(wx.EVT_BUTTON, self.changeIef)
         self.iefFileEdit_btn.Bind(wx.EVT_BUTTON, self.editIef)
-        self.datFileEdit_btn.Bind(wx.EVT_BUTTON, self.editIed)
+        self.datFileEdit_btn.Bind(wx.EVT_BUTTON, self.editDat)
+        self.iedFileEdit_btn.Bind(wx.EVT_BUTTON, self.editIed)
         
         # use gridbagsizer for layout of widgets
         sizer = wx.GridBagSizer(vgap=2, hgap=10)
@@ -198,10 +199,15 @@ class Fpanel(wx.Panel):
   
       self.zznFile.SetValue(self.p.ief.zznFile)
       self.lastEditTime1D.SetValue(str(time.ctime(self.p.ief.lastEditTime1D)))
-      self.zznTime.SetValue(str(time.ctime(self.p.ief.zznTime)))
-      self.zznSize.SetValue(self.p.ief.zznSize)
-      self.zzdMessage.SetValue(self.p.ief.zzdMessage) 
-        
+      if type(self.p.ief.zznTime) == float():
+        self.zznTime.SetValue(str(time.ctime(self.p.ief.zznTime)))
+        self.zznSize.SetValue(self.p.ief.zznSize)
+        self.zzdMessage.SetValue(self.p.ief.zzdMessage)
+      else:
+        self.zznTime.SetValue('')
+        self.zznSize.SetValue('')
+        self.zzdMessage.SetValue('')
+                
       self.iefFileMsg.SetValue(self.p.ief.iefFileMsg)
       self.datFileMsg.SetValue(self.p.ief.datFileMsg)
       self.iedFileMsg.SetValue(self.p.ief.iedFileMsg)
