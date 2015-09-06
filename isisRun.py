@@ -25,6 +25,7 @@ Front page tab for calculation, used to hold catchment title, author and checkin
 
 '''
 import wx,time,os,subprocess
+from PIL import Image
 
 class Fpanel(wx.Panel):
     def __init__(self, parent,p):
@@ -54,7 +55,10 @@ class Fpanel(wx.Panel):
         self.lastEditTime1DLabel = wx.StaticText(self, -1, "Input last edit" )
         self.zznTimeLabel = wx.StaticText(self, -1, ".zzn write time" )
         self.zznSizeLabel = wx.StaticText(self, -1, ".zzn size" )
-        self.zzdMessageLabel = wx.StaticText(self, -1, ".zzd message" )       
+        self.zzdMessageLabel = wx.StaticText(self, -1, ".zzd message" )
+
+        blankImg = wx.EmptyImage(401,441)
+        self.imageCtrl = wx.StaticBitmap(self, wx.ID_ANY, wx.BitmapFromImage(blankImg)) 
 
         self.iefFile = wx.TextCtrl(self, -1, "-",size=(800,20))
         self.datFile = wx.TextCtrl(self, -1, "-",size=(800,20), style =wx.TE_READONLY)
@@ -142,7 +146,9 @@ class Fpanel(wx.Panel):
         sizer.Add(self.zzdFileEdit_btn,pos=(14,2))
         sizer.Add(self.lastEditTime1D,pos=(15,1))
         sizer.Add(self.zznTime,pos=(16,1))
-        sizer.Add(self.zznSize,pos=(17,1))       
+        sizer.Add(self.zznSize,pos=(17,1))
+        
+        sizer.Add(self.imageCtrl,pos=(8,3),span=(10,2))       
     
         sizer.Add(self.iefFileEdit_btn,pos=(0,5))
         sizer.Add(self.datFileEdit_btn,pos=(1,5))
@@ -223,4 +229,12 @@ class Fpanel(wx.Panel):
       self.iedFileMsg.SetValue(self.p.ief.iedFileMsg)
       self.resultsDirMsg.SetValue(self.p.ief.resultsDirMsg)
       self.icMsg.SetValue(self.p.ief.icFileMsg)
-      self.tcfFileMsg.SetValue(self.p.ief.tcfFileMsg)                 
+      self.tcfFileMsg.SetValue(self.p.ief.tcfFileMsg)    
+      
+      if os.path.isfile(self.p.ief.imageFile):
+        pilImage = Image.open(self.p.ief.imageFile)
+        image = wx.EmptyImage(pilImage.size[0],pilImage.size[1])
+        image.SetData(pilImage.convert('RGB').tostring())
+        image.SetAlphaData(pilImage.convert('RGBA').tostring()[3::4])        
+        img = wx.BitmapFromImage(image)
+        self.imageCtrl.SetBitmap(img)             

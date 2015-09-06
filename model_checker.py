@@ -2,7 +2,7 @@
 Created by Neil Nutt without any warranty 
 v0.0.1
 ''' 
-import os,time
+import os,time,glob
 import check_1d2d_linkage
 
 
@@ -104,7 +104,7 @@ class IefCheck():
     self.zznSize = 'None'
     self.zznTime = 'None'
     self.zzdFile = 'None'
-    self.zznFile = 'None'
+    self.imageFile = 'None'
     self.timestep2D  = 'None'
     self.tcfFile = 'None'
     self.lastEditTime1D = 0
@@ -116,6 +116,23 @@ class IefCheck():
     self.resultsDirMsg = 'None'
     self.icFileMsg = 'From steady state results'
     self.tcfFileMsg = 'None'   
+
+  def resultsInfo(self):
+    if os.path.isfile(self.zznFile):
+      self.zznTime = os.path.getmtime(self.zznFile)
+      self.zznSize = str(round(os.path.getsize(self.zznFile)/1024/1024.0,2))
+    
+    if os.path.isfile(self.zzdFile):
+      d = open(self.zzdFile)
+      self.zzdMessage = 'run not completed'
+
+      for dline in d:
+        if dline.startswith('run completed'):
+          self.zzdMessage = 'run completed'
+      d.close()
+      
+      ##Find the highest numbered bmp file
+      self.imageFile = max(glob.iglob(self.zzdFile[:-4]+'*.[Bb][Mm][Pp]'), key=os.path.getctime)
   
   def checkIef(self,filePath):
     print "Starting to check:",filePath
@@ -168,19 +185,8 @@ class IefCheck():
             os.unlink(temp)
           except:
             self.resltsDirMsg = 'No write access'
-
-        if os.path.isfile(self.zznFile):
-          self.zznTime = os.path.getmtime(self.zznFile)
-          self.zznSize = str(round(os.path.getsize(self.zznFile)/1024/1024.0),2)
-        
-        if os.path.isfile(self.zzdFile):
-          d = open(self.zzdFile)
-          self.zzdMessage = 'run not completed'
-          for dline in d:
-            if dline.startswith('run completed'):
-              self.zzdMessage = 'run completed'
-          d.close()
-    
+            
+        self.resultsInfo()
             
       elif line.startswith('Timestep'):
         self.timestep = line.split('=')[-1]
@@ -232,6 +238,29 @@ class IefCheck():
           self.tcfFileMsg = 'File not found'
         if os.path.getmtime(fname) > self.lastEditTime1D:
             self.lastEditTime1D = os.path.getmtime(fname)
+            
+    if self.zznFile == 'None':
+      self.zznFile = self.iefFile[:-4]+'.zzn'
+      self.zzdFile = self.iefFile[:-4]+'.zzd'
+      dirName = os.path.split(self.iefFile)[0]
+      self.resultLocation = dirName
+      if ':' not in dirName: ##then it is relative to the cwd and need to convert to abs  
+        self.resultLocation = os.path.join(os.path.split(self.iefFile)[0],self.resultLocation)
+      elif os.path.isdir(dirName)==False:
+        self.iefErrors.append(("Results location doesn't exist:", dirName))
+        self.resultsDirMsg = 'Directory not found'
+      else:
+        # Check you have write premission at this location
+        try:
+          temp = os.path.join(self.resultLocation,'model_checker_temp_safe_to_delete')
+          t = open(temp,'w')
+          t.write('model_checker_temp_file_safe_to_delete')
+          t.close()
+          os.unlink(temp)
+        except:
+          self.resltsDirMsg = 'No write access'
+      self.resultsInfo()
+    
           
     if len(self.iefErrors)== 0:
       print "No errors found in ief"
